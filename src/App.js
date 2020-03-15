@@ -1,7 +1,9 @@
 import React, { lazy, Suspense } from "react";
 import "./App.css";
 import { Switch, BrowserRouter, Route } from "react-router-dom";
+import { connect } from "react-redux";
 import theme from "./themes/theme";
+import store from './helpers/store';
 
 const Header = lazy(() =>
   import(/* webpackChunkName: "Header" */ "./components/Header/Header")
@@ -19,47 +21,20 @@ const Home = lazy(() =>
   import(/* webpackChunkName: "Home" */ "./components/Home/Home")
 );
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      isLoggedIn: false,
-      isDark: true,
-      posts: []
-    };
-  }
-
-  async componentDidMount() {
-    const response = await fetch(
-      "https://jsonplaceholder.typicode.com/photos?_start=0&_limit=4"
-    );
-    const posts = await response.json();
-    this.setState({
-      posts: posts
-    });
-  }
-
-  toggleLogin = () => {
-    this.setState(prevState => ({
-      isLoggedIn: !prevState.isLoggedIn
-    }));
-  };
-
-  toggleTheme = () => {
-    this.setState(prevState => ({
-      isDark: !prevState.isDark
-    }));
-  };
+class AppComponent extends React.Component {
 
   render() {
-    const { isLoggedIn, isDark, posts } = this.state;
+    console.log(store.getState())
+    store.subscribe(() => console.log(store.getState()));
+
+    // console.log(this.props);
     return (
       <BrowserRouter>
         <Suspense fallback={<h1>loading</h1>}>
           <Header />
           <div
             style={
-              this.state.isDark
+              this.props.isDark
                 ? {
                     backgroundColor: theme.dark.bg,
                     height: "100vh",
@@ -74,9 +49,7 @@ class App extends React.Component {
           >
             <Switch>
               <Route exact path="/" component={Home} />
-
               <Route exact path="/login" component={Login} />
-
               <Route exact path="/products" component={Products} />
             </Switch>
           </div>
@@ -86,4 +59,11 @@ class App extends React.Component {
   }
 }
 
+const mapStateToProps = state => {
+  return { 
+    isDark : state.header.isDark,
+  };
+};
+
+const App = connect(mapStateToProps)(AppComponent);
 export default App;

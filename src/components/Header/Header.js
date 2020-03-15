@@ -1,18 +1,24 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { MyContext } from "../../App";
+import { connect } from "react-redux";
+import {toggleThemeAction} from '../../actions/header.actions';
 
-export default class Header extends React.Component {
+class HeaderComponent extends React.Component {
+  componentDidMount(){
+    // this.props.toggleTheme();
+  }
+
   render() {
+    // console.log('header class', this.props);
     return (
       <nav
         className={
-          values.isDark
+          this.props.isDark
             ? "navbar navbar-expand-lg navbar-dark bg-dark"
             : "navbar navbar-expand-lg navbar-light bg-light"
         }
       >
-        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div className="" id="navbarNavAltMarkup">
           <div className="navbar-nav text-center">
             <NavLink
               className="nav-item nav-link "
@@ -37,12 +43,12 @@ export default class Header extends React.Component {
             </NavLink>
             <button
               type="button"
-              className={values.isDark ? "btn btn-light" : "btn btn-dark"}
+              className={this.props.isDark ? "btn btn-light" : "btn btn-dark"}
               onClick={() => {
-                values.toggleTheme();
+                this.props.toggleTheme(this.props.isDark);
               }}
             >
-              {values.isDark ? "Light" : "Dark"}
+              {this.props.isDark ? "Light" : "Dark"}
             </button>
           </div>
         </div>
@@ -50,3 +56,19 @@ export default class Header extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return { 
+    isLoggedIn: state.login.isLoggedIn,
+    isDark : state.header.isDark,
+   }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    toggleTheme : (data) => dispatch(toggleThemeAction.toggleTheme(data)),
+  }
+}
+
+const Header = connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
+export default Header;

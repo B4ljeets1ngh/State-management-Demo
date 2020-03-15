@@ -1,20 +1,27 @@
 import React from "react";
 import theme from "../../themes/theme";
+import {getProduct} from '../../actions/products.acions';
+import { connect } from 'react-redux';
 
-export default class Login extends React.Component {
+
+class ProductComponent extends React.Component {
+  componentDidMount(){
+    this.props.getProducts();
+  }
+
   render() {
-    return values.isLoggedIn ? (
+    return( 
+      this.props.isLoggedIn ? (
       <React.Fragment>
         <h1>PRODUCTS</h1>
         <div className="container">
           <div className="row">
-            {values.posts.map(post => (
-              <React.Fragment>
-                <div className="col-sm-6 col-md-4 col-lg-3 mt-4">
+            {this.props.products && this.props.products.map((post,idx) => (
+                <div className="col-sm-6 col-md-4 col-lg-3 mt-4" key={idx}>
                   <div
                     className="card p-1"
                     style={
-                      values.isDark
+                      this.props.isDark
                         ? {
                             backgroundColor: theme.dark.bg,
                             color: theme.dark.text,
@@ -37,13 +44,31 @@ export default class Login extends React.Component {
                     </div>
                   </div>
                 </div>
-              </React.Fragment>
             ))}
           </div>
         </div>
       </React.Fragment>
     ) : (
       <h1>PLEASE LOGIN FIRST</h1>
-    );
+    )
+    )
   }
 }
+
+const mapStateToProps = state => {
+  // console.log(state)
+  return { 
+    isLoggedIn: state.login.isLoggedIn,
+    products : state.products.products,
+    isDark : state.header.isDark,
+   }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    getProducts : () => dispatch(getProduct.getProducts()),
+  }
+}
+
+const Products = connect(mapStateToProps, mapDispatchToProps)(ProductComponent);
+export default Products;
